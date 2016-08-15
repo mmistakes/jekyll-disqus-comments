@@ -1,60 +1,74 @@
-# Jekyll Disqus comments
-## Import comments from a Disqus blog into Jekyll
+# Jekyll Disqus Comments Importer
 
-If you have migrated an posts from a Disqus blog to Jekyll,
-this plugin will allow you to keep the comments from the old Disqus posts.
+## Migrate Disqus comments into static YAML files for use with [Staticman][staticman].
 
-This plugin assumes that the Disqus blog has not been deactivated.
-If it is unreachable via the Disqus API, this plugin will not be able to fetch comments.
+`disqus_comments.rake` assumes that the Disqus blog has **not been deactivated**. If it is unreachable via the Disqus API, this plugin will not be able to fetch comments.
 
-This plugin will download the posts comments from Disqus and cache them in the `_comments/`
-folder at the root of the Jekyll site. To refresh the comments, simply empty the `_comments/`
-folder
+This plugin will download post comments from Disqus and cache them in `_data/comments/<post-slug>/` folders at the root of the Jekyll site.
 
 ### Installation
 
 Copy the following files to your Jekyll site folder.
 
 * `_rake/disqus_comments.rake`
-* `_plugins/static_comments.rb`  (Not necessary if you're already using [jekyll-static-comments](https://github.com/mpalmer/jekyll-static-comments))
-* `_includes/comments.html`
 * `Rakefile` (Not necessary if you already have a Rakefile that loads `_rake/*`)
 
-### Disqus API Key
+### Obtain Disqus API Public Key
 
-To use the plugin, you will need to obtain a [Disqus API key](http://disqus.com/api/applications/) and add it to your `_config.yml`
+To use the plugin, you will need to obtain a `public key` from the [Disqus API](http://disqus.com/api/applications/) and add it to your `_config.yml`.
+
+1. [Register new application](https://disqus.com/api/applications/register/)
+2. Setup application. Suggested configuration below:
+
+```
+Label: <Name of application> eg. Jekyll Disqus importer
+Description: Convert comments into static files.
+Website:
+Domains: disqus.com
+Default Access: Read only
+```
 
 Add the following lines to your `_config.yml`
 
-    comments:
-      disqus:
-        short_name: YOUR-DISQUS-FORUM-SHORTNAME-HERE
-        api_key:    YOUR-DISQUS-PUBLIC-KEY-HERE
-
+```
+comments:
+  disqus:
+    short_name: YOUR-DISQUS-FORUM-SHORTNAME-HERE
+    api_key:    YOUR-DISQUS-PUBLIC-KEY-HERE
+```
 
 ### Importing Disqus Comments
 
-Importing comments from Disqus is as simple as running `rake disquscomments`
+Import comments from Disqus by running `rake disquscomments`
 
-### Template Setup
+### Troubleshooting
 
-Copy the following line into your **Post** template where you would like comments to appear.
+When running `rake disquscomments` you may see warnings like:
 
-`{% include comments.html %}`
+```
+Comments feed not found: <domain.com>/post-slug/
+```
 
-Alternatively, you could use `_includes/comments.html` as a guide to custom taylor the code to fit your site.
+This likely means no comments exist for a given post. It could also mean `ident` is wrong and needs to be modified to match the Disqus identifier of each post.
 
-You will also need to add some CSS to style comments appropriately.
+To verify Disqus identifiers:
+
+1. [Export Disqus comments](https://disqus.com/admin/discussions/export/) as XML.
+2. Download and open XML file.
+3. Look for `<link>` elements. This is what Disqus is using to identify each comment feed. eg. `<link>https://mademistakes.com/mastering-paper/contour-drawing/</link>`
+
+By default the plugin attempts to get comments using the default Disqus identifier of `domain.com/post-slug/`. It assumes `url` has been set in `_config.yml`. If you used something else you will need to modify the following line in `disqus_comments.rake`:
+
+```
+# site.url + post.id + trailing slash
+ident    = site['url'] + post.id + '/'
+```
 
 ## License
 
 Copyright &copy; 2013 Patrick Hawks and licensed under dual licensed under [The MIT License](http://opensource.org/licenses/MIT) and the [GNU General Public License, version 2 or later](http://opensource.org/licenses/gpl-2.0.php), except for the files noted below.
 
 You don't have to do anything special to choose one license or the other and you don't have to notify anyone which license you are using.
-
-***
-
-`_plugins/static_comments.rb` from [jekyll-static-comments](https://github.com/mpalmer/jekyll-static-comments) and licensed under the [GNU General Public License, version 3](http://opensource.org/licenses/gpl-3.0.html)
 
 ***
 
@@ -79,3 +93,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+[staticman]: https://staticman.net/
