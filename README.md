@@ -57,7 +57,7 @@ To verify Disqus identifiers:
 2. Download and open XML file.
 3. Look for `<link>` elements. This is what Disqus is using to identify each comment feed. eg. `<link>https://mademistakes.com/mastering-paper/contour-drawing/</link>`
 
-By default the plugin attempts to get comments using the default Disqus identifier of `domain.com/post-slug/`. It assumes `url` has been set in `_config.yml`. If you used something else you will need to modify the following line in `disqus_comments.rake`:
+By default the plugin attempts to get comments using the default Disqus identifier of `domain.com/post-id/`. It assumes `url` has been set in `_config.yml`. If you used something else you will need to modify the following line in `disqus_comments.rake`:
 
 ```
 # site.url + post.id + trailing slash
